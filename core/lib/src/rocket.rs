@@ -386,11 +386,18 @@ impl Rocket {
 
     #[inline]
     fn configured(config: Config) -> Rocket {
+        let config_file: String;
         if logger::try_init(config.log_level, false) {
             // Temporary weaken log level for launch info.
             logger::push_max_level(logger::LoggingLevel::Normal);
         }
-
+        if config.config_file_path == None {
+            config_file = "(internal)".to_string();
+            launch_info!("{}Using config file {}.", Paint::masked("⚙  "), Paint::default(config_file).italic().dimmed());
+        } else {
+            config_file = config.config_file_path.clone().unwrap().into_os_string().into_string().unwrap();
+            launch_info!("{}Using config file {}.", Paint::masked("⚙  "), Paint::default(config_file).bold());
+        }
         launch_info!("{}Configured for {}.", Paint::masked("🔧 "), config.environment);
         launch_info_!("address: {}", Paint::default(&config.address).bold());
         launch_info_!("port: {}", Paint::default(&config.port).bold());
